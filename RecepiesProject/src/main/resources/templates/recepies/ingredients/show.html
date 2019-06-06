@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="ISO-8859-1">
+<title>Recepies Index Page</title>
+<link rel="stylesheet" th:href="@{/webjars/bootstrap/4.3.1/css/bootstrap.min.css}"/>
+<script type="text/javascript" src="/webjars/jquery/3.3.1-2/jquery.min.js"></script>
+<script type="text/javascript" th:src="@{/webjars/bootstrap/4.3.1/js/bootstrap.min.js}"></script>
+</head>
+<body>
+<div class="container-fluid">
+<h1>Ingredients Details</h1>
+<table class="table table-hover">
+<thead>
+	<tr>
+		<th>ID</th>
+		<th>Description</th>
+	</tr>
+</thead>
+<tbody>
+<tr th:remove="all">
+		<th>123</th>
+		<th>Tasty Goodness 1</th>
+	</tr>
+	<tr th:remove="all">
+		<th>334</th>
+		<th>Tasty Goodness 3</th>
+	</tr>
+	<tr th:each="ingredient : ${ingredients}">
+		<th th:text="${ingredient.id}">334</th>
+		<th th:text="${ingredient.amount}+' '+${ingredient.getUnitOfMeasure().getUnitOfMeasure()}
+		+' '+${ingredient.description}">Tasty Goodness 3</th>
+	</tr>
+</tbody>
+</table>
+</div>
+</body>
+</html>
