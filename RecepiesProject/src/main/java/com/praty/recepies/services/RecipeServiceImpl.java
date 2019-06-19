@@ -13,6 +13,7 @@ import com.praty.recepies.commands.RecipeCommand;
 import com.praty.recepies.converters.RecipeCommandToRecipe;
 import com.praty.recepies.converters.RecipeToRecipeCommand;
 import com.praty.recepies.domain.Recipe;
+import com.praty.recepies.exceptions.NotFoundException;
 import com.praty.recepies.repositories.RecipeRepository;
 
 import lombok.extern.slf4j.Slf4j;
@@ -39,9 +40,12 @@ public class RecipeServiceImpl implements RecipeService {
 		return setOfRecipe;
 	}
 	
-	public Recipe findById(Long id) {
+	public Recipe findById(Long id){
 		Recipe recipe=new Recipe();
 		Optional<Recipe> optionalRecipe=recipeRepo.findById(id);
+		if(!optionalRecipe.isPresent()) {
+				throw new NotFoundException("Recipe not found for Id--> "+id.toString());
+		}
 		recipe=optionalRecipe.get();
 		return recipe;
 	}
@@ -60,7 +64,7 @@ public class RecipeServiceImpl implements RecipeService {
 	
 	@Override
     @Transactional
-    public RecipeCommand findCommandById(Long l) {
+    public RecipeCommand findCommandById(Long l){
         return recipeToRecipeCommand.convert(findById(l));
     }
 }

@@ -18,6 +18,7 @@ import com.praty.recepies.services.IngredientsService;
 import com.praty.recepies.services.RecipeService;
 import com.praty.recepies.services.UnitOfMeasureService;
 
+import javassist.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -36,7 +37,7 @@ public class IngredientsController {
 	}
 
 	@RequestMapping({"/recipe/ingredients/{id}"})
-	public String getIngredientList(@PathVariable String id,Model model) {
+	public String getIngredientList(@PathVariable String id,Model model) throws NumberFormatException, NotFoundException {
 		log.debug("Inside getIngredientList method of IngredientsController");
 		RecipeCommand recipeCommand=recipeService.findCommandById(Long.valueOf(id));
 		model.addAttribute("recipe",recipeCommand);

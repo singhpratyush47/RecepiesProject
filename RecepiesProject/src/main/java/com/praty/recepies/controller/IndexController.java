@@ -5,16 +5,21 @@ import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.xml.stream.events.NotationDeclaration;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.praty.recepies.commands.RecipeCommand;
 import com.praty.recepies.converters.CategoryToCategoryCommand;
@@ -25,8 +30,8 @@ import com.praty.recepies.converters.UnitOfMeasureToUnitOfMeasureCommand;
 import com.praty.recepies.domain.Category;
 import com.praty.recepies.domain.Recipe;
 import com.praty.recepies.domain.UnitOfMeasure;
+import com.praty.recepies.exceptions.NotFoundException;
 import com.praty.recepies.repositories.CategoryRepository;
-import com.praty.recepies.repositories.UnitOfMeasureRepository;
 import com.praty.recepies.services.RecipeService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -51,14 +56,14 @@ public class IndexController {
 	}
 	
 	@RequestMapping({"/recipe/show/{id}"})
-	public String showRecepieDescription(@PathVariable String id,Model model) {
+	public String showRecepieDescription(@PathVariable String id,Model model) throws NumberFormatException {
 		log.debug("Inside showRecepieDescription method of IndexController");
 		model.addAttribute("recipe",recipeService.findById(Long.valueOf(id)));
 		return "recepies/show";
 	}
 	
 	@GetMapping("recipe/update/{id}")
-    public String updateRecipe(@PathVariable String id, Model model){
+    public String updateRecipe(@PathVariable String id, Model model) throws NumberFormatException{
 		RecipeCommand recipeCommand=recipeService.findCommandById(Long.valueOf(id));
         model.addAttribute("recipe",recipeCommand);
         return  "recepies/recipeForm";
@@ -90,4 +95,17 @@ public class IndexController {
 		recipeService.deleteById(Long.valueOf(id));
         return  "redirect:/";
     }
+	
+	@ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(NotFoundException.class)
+    public ModelAndView handleNotFound(Exception exception){
+
+        log.error("Handling not found exception");
+        log.error(exception.getMessage());
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("404error");
+        modelAndView.addObject("exception", exception);
+        return modelAndView;
+    }
+	
 }

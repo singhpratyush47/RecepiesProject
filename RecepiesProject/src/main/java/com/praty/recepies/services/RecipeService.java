@@ -6,6 +6,8 @@ import java.util.Set;
 import com.praty.recepies.commands.RecipeCommand;
 import com.praty.recepies.domain.Recipe;
 
+import javassist.NotFoundException;
+
 public interface RecipeService {
 
 	public Set<Recipe> setOfRecepies();
