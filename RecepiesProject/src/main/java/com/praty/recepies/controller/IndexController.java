@@ -5,12 +5,14 @@ import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 import javax.xml.stream.events.NotationDeclaration;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -41,7 +43,7 @@ import lombok.extern.slf4j.Slf4j;
 public class IndexController {
 
 	RecipeService recipeService;
-	
+	private static final String RECIPE_RECIPEFORM_URL="recepies/recipeForm";
 	public IndexController(RecipeService recipeService) {
 		super();
 		this.recipeService = recipeService;
@@ -66,7 +68,7 @@ public class IndexController {
     public String updateRecipe(@PathVariable String id, Model model) throws NumberFormatException{
 		RecipeCommand recipeCommand=recipeService.findCommandById(Long.valueOf(id));
         model.addAttribute("recipe",recipeCommand);
-        return  "recepies/recipeForm";
+        return  RECIPE_RECIPEFORM_URL;
     }
 	
 	@RequestMapping("/recipe/openModal")
@@ -80,12 +82,19 @@ public class IndexController {
 	@RequestMapping("/recipe/new")
 	public String getRecipeForm(Model model) {
 		model.addAttribute("recipe",new RecipeCommand());
-		return "recepies/recipeForm";
+		return RECIPE_RECIPEFORM_URL;
 	}
 	
 	@PostMapping
 	@RequestMapping("recipe")
-	public String saveOrUpdate(@ModelAttribute RecipeCommand command) {
+	public String saveOrUpdate(@Valid  @ModelAttribute("recipe") RecipeCommand command,
+			BindingResult bindingResult) {
+		if(bindingResult.hasErrors()) {
+			bindingResult.getAllErrors().forEach(error->{
+				log.debug(error.toString());
+			});
+			return RECIPE_RECIPEFORM_URL;
+		}
 		RecipeCommand recipeCommand=recipeService.saveRecipeCommand(command);
 		return "redirect:/recipe/show/"+recipeCommand.getId();
 	}
